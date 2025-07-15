@@ -35,7 +35,10 @@ namespace romfs {
         template<ByteType T = std::byte>
         [[nodiscard]] const T* data() const {
             impl::ROMFS_CONCAT(decompress_if_needed_, LIBROMFS_PROJECT_NAME)(m_decompressedData, m_compressedData);
-            return reinterpret_cast<const T*>(this->m_decompressedData.data());
+            if (!m_decompressedData.empty()) [[likely]]
+                return reinterpret_cast<const T*>(this->m_decompressedData.data());
+            else
+                return reinterpret_cast<const T*>(this->m_compressedData.data());
         }
 
         template<ByteType T = std::byte>
@@ -47,10 +50,10 @@ namespace romfs {
         std::size_t size() const {
             impl::ROMFS_CONCAT(decompress_if_needed_, LIBROMFS_PROJECT_NAME)(m_decompressedData, m_compressedData);
 
-            if (this->m_decompressedData.empty())
-                return 0;
-            else
+            if (!this->m_decompressedData.empty()) [[likely]]
                 return this->m_decompressedData.size() - 1;
+            else
+                return m_compressedData.size_bytes() - 1;
         }
 
         [[nodiscard]]

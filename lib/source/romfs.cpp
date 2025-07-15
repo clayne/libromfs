@@ -55,7 +55,8 @@ namespace romfs {
             // Clean up
             inflateEnd(&stream);
         #else
-            std::copy(compressedData.begin(), compressedData.end(), std::back_inserter(decompressedData));
+            std::ignore = compressedData;
+            std::ignore = decompressedData;
         #endif
     }
 
